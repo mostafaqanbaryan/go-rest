@@ -1,14 +1,34 @@
 package repositories
 
-import "mostafaqanbaryan.com/go-rest/internal/entities"
+import (
+	"mostafaqanbaryan.com/go-rest/internal/entities"
+	"mostafaqanbaryan.com/go-rest/internal/errors"
+)
 
-type UserRepositoryDB struct {
+type Db interface {
+	SelectAll(string, ...any) ([]any, error)
+	SelectOne(string, ...any) (any, error)
 }
 
-func NewUserRepositoryDB() UserRepositoryDB {
-	return UserRepositoryDB{}
+type UserRepositoryDB struct {
+	db Db
+}
+
+func NewUserRepositoryDB(db Db) UserRepositoryDB {
+	return UserRepositoryDB{
+		db: db,
+	}
 }
 
 func (r UserRepositoryDB) FindByUsername(username string) (*entities.User, error) {
-	return nil, nil
+	if r.db == nil {
+		return nil, nil
+	}
+
+	user, err := r.db.SelectOne("SELECT * FROM users WHERE username = ? LIMIT 1", username)
+	switch err {
+	case errors.ErrNotFound:
+		return nil, errors.ErrUserNotFound
+	}
+	return user.(*entities.User), nil
 }

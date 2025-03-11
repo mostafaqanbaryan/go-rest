@@ -4,16 +4,44 @@ import (
 	"errors"
 	"testing"
 
+	cerrors "mostafaqanbaryan.com/go-rest/internal/errors"
 	"mostafaqanbaryan.com/go-rest/internal/repositories"
 )
 
 func TestUserService(t *testing.T) {
-	t.Run("Login not found", func(t *testing.T) {
-		userRepository := repositories.NewUserRepositoryMock()
-		userService := NewUserService(userRepository)
-		_, err := userService.Login("test", "test")
-		if !errors.Is(err, UserNotFound{}) {
-			t.Fatalf("want <%v>, got: <%v>", UserNotFound{}, err)
+	username := "test"
+	password := "test"
+
+	userRepository := repositories.NewUserRepositoryMock()
+	userService := NewUserService(userRepository)
+
+	t.Run("User not found", func(t *testing.T) {
+		user, err := userService.Login("notfound", password)
+		if !errors.Is(err, cerrors.ErrUserNotFound) {
+			t.Fatalf("want <%v>, got: <%v>", cerrors.ErrUserNotFound, err)
+		}
+		if user != nil {
+			t.Fatalf("want user nil, got: <%v>", user)
+		}
+	})
+
+	t.Run("User password is wrong", func(t *testing.T) {
+		user, err := userService.Login(username, "wrongpassword")
+		if !errors.Is(err, cerrors.ErrPasswordIsWrong) {
+			t.Fatalf("want <%v>, got: <%v>", cerrors.ErrPasswordIsWrong, err)
+		}
+		if user != nil {
+			t.Fatalf("want user nil, got: <%v>", user)
+		}
+	})
+
+	t.Run("User found", func(t *testing.T) {
+		user, err := userService.Login(username, password)
+		if err != nil {
+			t.Fatalf("want nil, got: <%v>", err)
+		}
+		if user.Username != "test" {
+			t.Fatalf("want username %s, got: <%v>", username, user.Username)
 		}
 	})
 }

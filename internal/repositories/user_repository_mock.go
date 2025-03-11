@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"mostafaqanbaryan.com/go-rest/internal/entities"
-	"mostafaqanbaryan.com/go-rest/internal/errors"
+	cerrors "mostafaqanbaryan.com/go-rest/internal/errors"
 )
 
 type UserRepositoryMock struct {
@@ -13,5 +13,11 @@ func NewUserRepositoryMock() UserRepositoryMock {
 }
 
 func (r UserRepositoryMock) FindByUsername(username string) (*entities.User, error) {
-	return nil, errors.UserNotFound{}
+	if username == "test" {
+		return &entities.User{
+			Username: "test",
+			Password: "test",
+		}, nil
+	}
+	return nil, cerrors.ErrUserNotFound
 }

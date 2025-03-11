@@ -2,7 +2,7 @@ package services
 
 import (
 	"mostafaqanbaryan.com/go-rest/internal/entities"
-	"mostafaqanbaryan.com/go-rest/internal/errors"
+	cerrors "mostafaqanbaryan.com/go-rest/internal/errors"
 )
 
 type UserRepository interface {
@@ -29,8 +29,8 @@ func (s UserService) Login(username, password string) (*entities.User, error) {
 		return nil, err
 	}
 
-	if !user.IsPasswordCorrect(password) {
-		return nil, errors.PasswordIsWrong{}
+	if user.Password != password {
+		return nil, cerrors.ErrPasswordIsWrong
 	}
 
 	return user, nil
