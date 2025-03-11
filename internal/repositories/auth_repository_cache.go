@@ -17,7 +17,7 @@ func NewAuthRepositoryCache(rdb *redis.Client) AuthRepositoryCache {
 	}
 }
 
-func (r AuthRepositoryCache) NewUserSession(user *entities.User) (string, error) {
+func (r AuthRepositoryCache) NewUserSession(user entities.User) (string, error) {
 	sessionID := "1232"
 	ctx := context.Background()
 	_, err := r.db.Get(ctx, sessionID).Result()

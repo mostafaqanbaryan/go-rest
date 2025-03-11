@@ -16,22 +16,16 @@ func TestUserService(t *testing.T) {
 	userService := NewUserService(userRepository)
 
 	t.Run("User not found", func(t *testing.T) {
-		user, err := userService.Login("notfound", password)
+		_, err := userService.Login("notfound", password)
 		if !errors.Is(err, cerrors.ErrUserNotFound) {
 			t.Fatalf("want <%v>, got: <%v>", cerrors.ErrUserNotFound, err)
-		}
-		if user != nil {
-			t.Fatalf("want user nil, got: <%v>", user)
 		}
 	})
 
 	t.Run("User password is wrong", func(t *testing.T) {
-		user, err := userService.Login(username, "wrongpassword")
+		_, err := userService.Login(username, "wrongpassword")
 		if !errors.Is(err, cerrors.ErrPasswordIsWrong) {
 			t.Fatalf("want <%v>, got: <%v>", cerrors.ErrPasswordIsWrong, err)
-		}
-		if user != nil {
-			t.Fatalf("want user nil, got: <%v>", user)
 		}
 	})
 

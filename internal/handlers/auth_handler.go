@@ -10,11 +10,11 @@ import (
 )
 
 type AuthService interface {
-	CreateSession(user *entities.User) (string, error)
+	CreateSession(user entities.User) (string, error)
 }
 
 type UserService interface {
-	Login(username, password string) (*entities.User, error)
+	Login(username, password string) (entities.User, error)
 }
 
 type AuthHandler struct {

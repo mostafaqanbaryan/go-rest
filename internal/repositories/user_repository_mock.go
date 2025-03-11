@@ -12,12 +12,12 @@ func NewUserRepositoryMock() UserRepositoryMock {
 	return UserRepositoryMock{}
 }
 
-func (r UserRepositoryMock) FindByUsername(username string) (*entities.User, error) {
+func (r UserRepositoryMock) FindByUsername(username string) (entities.User, error) {
 	if username == "test" {
-		return &entities.User{
+		return entities.User{
 			Username: "test",
 			Password: "test",
 		}, nil
 	}
-	return nil, cerrors.ErrUserNotFound
+	return entities.User{}, cerrors.ErrUserNotFound
 }

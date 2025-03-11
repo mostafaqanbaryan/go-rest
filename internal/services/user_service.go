@@ -6,7 +6,7 @@ import (
 )
 
 type UserRepository interface {
-	FindByUsername(username string) (*entities.User, error)
+	FindByUsername(username string) (entities.User, error)
 }
 
 type UserService struct {
@@ -19,23 +19,23 @@ func NewUserService(userRepository UserRepository) UserService {
 	}
 }
 
-func (s UserService) Register(username, password string) (*entities.User, error) {
+func (s UserService) Register(username, password string) (entities.User, error) {
 	return s.repo.FindByUsername(username)
 }
 
-func (s UserService) Login(username, password string) (*entities.User, error) {
+func (s UserService) Login(username, password string) (entities.User, error) {
 	user, err := s.repo.FindByUsername(username)
 	if err != nil {
-		return nil, err
+		return entities.User{}, err
 	}
 
 	if user.Password != password {
-		return nil, cerrors.ErrPasswordIsWrong
+		return entities.User{}, cerrors.ErrPasswordIsWrong
 	}
 
 	return user, nil
 }
 
-func (s UserService) FindBySessionID(user, password string) (*entities.User, error) {
+func (s UserService) FindBySessionID(user, password string) (entities.User, error) {
 	return s.repo.FindByUsername(user)
 }
