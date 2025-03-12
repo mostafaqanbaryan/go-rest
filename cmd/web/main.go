@@ -18,7 +18,8 @@ func main() {
 		DB:       0,  // use default DB
 	})
 
-	db := database.NewMySQLDriver()
+	db := database.NewMySQLDriver("")
+	database.MigrateUp(db)
 	conn := entities.New(db)
 
 	authRepository := repositories.NewAuthRepositoryCache(rdb)
