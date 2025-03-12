@@ -5,4 +5,4 @@ if [[ -z "$1" ]]; then
     exit 1
 fi
 
-touch ./internal/database/migrations/$(date "+%Y%m%d%H%M%S")_$1.up.sql
+nvim ./internal/database/migrations/$(date "+%Y%m%d%H%M%S")_$1.up.sql
