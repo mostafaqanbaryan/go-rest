@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -35,17 +34,13 @@ func NewAuthHandler(authService AuthService, userService UserService) AuthHandle
 
 func (h *AuthHandler) Login(c echo.Context) error {
 	v := LoginRequest{}
-	err := fmt.Errorf("Login: %v", v)
-	c.Error(err)
-	return nil
 	if err := c.Bind(&v); err != nil {
 		c.Error(err)
 		return err
 	}
 	user, err := h.userService.Login(v.Username, v.Password)
 	if err != nil {
-		c.Error(err)
-		return err
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}
 
 	sessionId, err := h.authService.CreateSession(user)
