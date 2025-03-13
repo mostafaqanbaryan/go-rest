@@ -26,7 +26,7 @@ func (s UserService) Register(username, password string) (entities.User, error) 
 func (s UserService) Login(username, password string) (entities.User, error) {
 	user, err := s.repo.FindByUsername(username)
 	if err != nil {
-		return entities.User{}, err
+		return entities.User{}, cerrors.ErrNotFound
 	}
 
 	if user.Password != password {

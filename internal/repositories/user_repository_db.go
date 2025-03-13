@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"mostafaqanbaryan.com/go-rest/internal/entities"
-	cerrors "mostafaqanbaryan.com/go-rest/internal/errors"
 )
 
 type DB interface {
@@ -28,6 +27,9 @@ func NewUserRepositoryDB(db DB) UserRepositoryDB {
 
 func (r UserRepositoryDB) FindByUsername(username string) (entities.User, error) {
 	ctx := context.Background()
-	user, _ := r.db.FindUserByUsername(ctx, username)
-	return user, cerrors.ErrUserNotFound
+	user, err := r.db.FindUserByUsername(ctx, username)
+	if err != nil {
+		return entities.User{}, err
+	}
+	return user, nil
 }

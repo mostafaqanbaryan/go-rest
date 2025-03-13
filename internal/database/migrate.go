@@ -17,7 +17,7 @@ func MigrateUp(db *sql.DB) {
 		panic(fmt.Errorf("WithInstance: %w", err))
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("file://../../internal/database/migrations", "mysql", instance)
+	m, err := migrate.NewWithDatabaseInstance("file://internal/database/migrations", "mysql", instance)
 	if err != nil {
 		panic(fmt.Errorf("NewWithDatabaseInstance: %w", err))
 	}

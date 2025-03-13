@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/redis/go-redis/v9"
 	"mostafaqanbaryan.com/go-rest/internal/database"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 	"mostafaqanbaryan.com/go-rest/internal/handlers"
@@ -12,17 +11,12 @@ import (
 
 func main() {
 	e := echo.New()
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
+	cache := database.NewRedisDriver()
 	db := database.NewMySQLDriver("")
 	database.MigrateUp(db)
 	conn := entities.New(db)
 
-	authRepository := repositories.NewAuthRepositoryCache(rdb)
+	authRepository := repositories.NewAuthRepositoryCache(cache)
 	authService := services.NewAuthService(authRepository)
 
 	userRepository := repositories.NewUserRepositoryDB(conn)

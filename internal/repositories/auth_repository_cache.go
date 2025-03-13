@@ -11,17 +11,17 @@ type AuthRepositoryCache struct {
 	db *redis.Client
 }
 
-func NewAuthRepositoryCache(rdb *redis.Client) AuthRepositoryCache {
+func NewAuthRepositoryCache(db *redis.Client) AuthRepositoryCache {
 	return AuthRepositoryCache{
-		db: rdb,
+		db: db,
 	}
 }
 
 func (r AuthRepositoryCache) NewUserSession(user entities.User) (string, error) {
-	sessionID := "1232"
 	ctx := context.Background()
-	_, err := r.db.Get(ctx, sessionID).Result()
 	for {
+		sessionID := "1232"
+		_, err := r.db.Get(ctx, sessionID).Result()
 		if err == redis.Nil {
 			err := r.db.Set(ctx, "key", "value", 0).Err()
 			if err != nil {
