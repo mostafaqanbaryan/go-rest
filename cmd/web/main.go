@@ -11,8 +11,13 @@ import (
 
 func main() {
 	e := echo.New()
+
 	cache := database.NewRedisDriver()
+	defer cache.Close()
+
 	db := database.NewMySQLDriver("")
+	defer db.Close()
+
 	database.MigrateUp(db)
 	conn := entities.New(db)
 

@@ -2,13 +2,19 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func NewMySQLDriver(connection string) *sql.DB {
 	if connection == "" {
-		connection = "root:root@/gorest?parseTime=true"
+		dbName := os.Getenv("MYSQL_DATABASE")
+		dbUser := os.Getenv("MYSQL_USERNAME")
+		dbPass := os.Getenv("MYSQL_PASSWORD")
+		dbHost := os.Getenv("MYSQL_HOST")
+		connection = fmt.Sprintf("%s:%s@%s/%s?parseTime=true", dbUser, dbPass, dbHost, dbName)
 	}
 	conn, err := sql.Open("mysql", connection)
 	if err != nil {
