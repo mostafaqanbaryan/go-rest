@@ -29,6 +29,7 @@ type LoginRequest struct {
 func NewAuthHandler(authService AuthService, userService UserService) AuthHandler {
 	return AuthHandler{
 		userService: userService,
+		authService: authService,
 	}
 }
 
@@ -38,6 +39,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		c.Error(err)
 		return err
 	}
+
 	user, err := h.userService.Login(v.Username, v.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, err)
@@ -51,7 +53,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	cookie := createCookie(sessionId, time.Now().Add(time.Hour*24*365))
 	c.SetCookie(&cookie)
-	return c.JSON(http.StatusOK, "")
+	return c.JSON(http.StatusNoContent, "")
 }
 
 func (h *AuthHandler) Logout(c echo.Context) {
