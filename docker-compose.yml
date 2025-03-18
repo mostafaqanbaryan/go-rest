@@ -12,8 +12,10 @@ services:
     volumes:
       - ./:/app
     depends_on:
-      - db
-      - cache
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
     networks:
       - gorest
 
@@ -28,6 +30,12 @@ services:
       - ./docker-storage/mariadb:/var/lib/mysql
     networks:
       - gorest
+    healthcheck:
+      test: mysqladmin ping -u $$MYSQL_USER -p$$MYSQL_PASSWORD
+      start_period: 1s
+      interval: 2s
+      timeout: 2s
+      retries: 10
 
   cache:
     container_name: gorest_cache
@@ -38,6 +46,12 @@ services:
       - ./docker-storage/redis:/data
     networks:
       - gorest
+    healthcheck:
+      test: "[ $$(redis-cli ping) = 'PONG' ]"
+      start_period: 1s
+      interval: 2s
+      timeout: 2s
+      retries: 10
 
 networks:
   gorest:
