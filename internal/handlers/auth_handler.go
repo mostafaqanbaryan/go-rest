@@ -36,8 +36,7 @@ func NewAuthHandler(authService AuthService, userService UserService) AuthHandle
 func (h *AuthHandler) Login(c echo.Context) error {
 	v := LoginRequest{}
 	if err := c.Bind(&v); err != nil {
-		c.Error(err)
-		return err
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}
 
 	user, err := h.userService.Login(v.Username, v.Password)
@@ -47,8 +46,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	sessionId, err := h.authService.CreateSession(user)
 	if err != nil {
-		c.Error(err)
-		return err
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}
 
 	cookie := createCookie(sessionId, time.Now().Add(time.Hour*24*365))

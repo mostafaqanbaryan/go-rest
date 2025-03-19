@@ -1,8 +1,15 @@
 package services
 
 import (
+	"errors"
+
 	"mostafaqanbaryan.com/go-rest/internal/entities"
-	cerrors "mostafaqanbaryan.com/go-rest/internal/errors"
+)
+
+var (
+	ErrUserNotFound     = errors.New("user not found")
+	ErrUserAlreadyExist = errors.New("user already exists")
+	ErrPasswordIsWrong  = errors.New("password is wrong")
 )
 
 type UserRepository interface {
@@ -26,11 +33,11 @@ func (s UserService) Register(username, password string) (entities.User, error) 
 func (s UserService) Login(username, password string) (entities.User, error) {
 	user, err := s.repo.FindByUsername(username)
 	if err != nil {
-		return entities.User{}, cerrors.ErrNotFound
+		return entities.User{}, ErrUserNotFound
 	}
 
 	if user.Password != password {
-		return entities.User{}, cerrors.ErrPasswordIsWrong
+		return entities.User{}, ErrPasswordIsWrong
 	}
 
 	return user, nil

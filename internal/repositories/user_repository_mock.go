@@ -1,8 +1,9 @@
 package repositories
 
 import (
+	"errors"
+
 	"mostafaqanbaryan.com/go-rest/internal/entities"
-	cerrors "mostafaqanbaryan.com/go-rest/internal/errors"
 )
 
 type UserRepositoryMock struct {
@@ -19,5 +20,5 @@ func (r UserRepositoryMock) FindByUsername(username string) (entities.User, erro
 			Password: "test",
 		}, nil
 	}
-	return entities.User{}, cerrors.ErrUserNotFound
+	return entities.User{}, errors.New("user not found")
 }

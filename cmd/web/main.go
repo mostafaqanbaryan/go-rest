@@ -22,7 +22,7 @@ func main() {
 	database.MigrateUp(db)
 	conn := entities.New(db)
 
-	authRepository := repositories.NewAuthRepositoryCache(cache)
+	authRepository := repositories.NewAuthRepository(cache)
 	authService := services.NewAuthService(authRepository)
 
 	userRepository := repositories.NewUserRepositoryDB(conn)
