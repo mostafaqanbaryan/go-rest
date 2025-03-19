@@ -5,12 +5,11 @@ services:
       network: host
       context: .
     container_name: gorest_app
-    env_file:
-      - .env
     ports:
       - 3000:3000
     volumes:
       - ./:/app
+      - ./.env.docker:/app/.env
     depends_on:
       db:
         condition: service_healthy

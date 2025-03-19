@@ -1,3 +1,5 @@
 docker-compose.yml
 
 docker-storage
+
+.env

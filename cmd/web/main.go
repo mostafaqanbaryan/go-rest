@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
 	"mostafaqanbaryan.com/go-rest/internal/database"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
