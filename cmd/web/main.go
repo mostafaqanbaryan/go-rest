@@ -6,7 +6,6 @@ import (
 	authhandler "mostafaqanbaryan.com/go-rest/internal/auth/http"
 	authrepo "mostafaqanbaryan.com/go-rest/internal/auth/repository"
 	authservice "mostafaqanbaryan.com/go-rest/internal/auth/service"
-	"mostafaqanbaryan.com/go-rest/internal/database"
 	"mostafaqanbaryan.com/go-rest/internal/driver"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 	userhandler "mostafaqanbaryan.com/go-rest/internal/user/http"
@@ -23,7 +22,6 @@ func main() {
 	db := driver.NewMySQLDriver("")
 	defer db.Close()
 
-	database.MigrateUp(db)
 	conn := entities.New(db)
 
 	authRepository := authrepo.NewAuthRepository(cache)
