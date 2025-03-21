@@ -1,9 +1,11 @@
-package database
+package driver
 
 import (
 	"context"
 	"fmt"
 	"time"
+
+	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 )
 
 type MockCacheDriver struct {
@@ -19,7 +21,7 @@ func NewMockCacheDriver() MockCacheDriver {
 func (d MockCacheDriver) Get(ctx context.Context, key string) (string, error) {
 	res, ok := d.list[key]
 	if !ok {
-		return "", ErrRecordNotFound
+		return "", driverErrors.ErrRecordNotFound
 	}
 
 	return res, nil

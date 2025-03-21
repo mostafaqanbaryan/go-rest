@@ -1,4 +1,4 @@
-package database
+package driver
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 )
 
 type RedisDriver struct {
@@ -51,12 +52,12 @@ func NewRedisDriver() RedisDriver {
 func (d RedisDriver) Get(ctx context.Context, key string) (string, error) {
 	get := d.redis.Get(ctx, key)
 	if get == nil {
-		return "", ErrGetCommand
+		return "", driverErrors.ErrGetCommand
 	}
 
 	result, err := get.Result()
 	if err == redis.Nil {
-		return "", ErrRecordNotFound
+		return "", driverErrors.ErrRecordNotFound
 	} else if err != nil {
 		return "", err
 	}
@@ -67,7 +68,7 @@ func (d RedisDriver) Get(ctx context.Context, key string) (string, error) {
 func (d RedisDriver) Set(ctx context.Context, key string, value any, ttl time.Duration) error {
 	set := d.redis.Set(ctx, key, value, ttl)
 	if set == nil {
-		return ErrSetCommand
+		return driverErrors.ErrSetCommand
 	}
 
 	if err := set.Err(); err != nil {

@@ -1,23 +1,26 @@
-package services
+package service_test
 
 import (
 	"testing"
 
-	"mostafaqanbaryan.com/go-rest/internal/database"
+	"mostafaqanbaryan.com/go-rest/internal/auth/repository"
+	"mostafaqanbaryan.com/go-rest/internal/auth/service"
+	"mostafaqanbaryan.com/go-rest/internal/driver"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
-	"mostafaqanbaryan.com/go-rest/internal/repositories"
 )
 
 func TestAuthService(t *testing.T) {
+	t.Parallel()
+
 	user := entities.User{
 		ID:       123,
 		Username: "test",
 		Password: "test",
 	}
 
-	cache := database.NewMockCacheDriver()
-	authRepository := repositories.NewAuthRepository(cache)
-	authService := NewAuthService(authRepository)
+	cache := driver.NewMockCacheDriver()
+	authRepository := repository.NewAuthRepository(cache)
+	authService := service.NewAuthService(authRepository)
 
 	t.Run("Create session", func(t *testing.T) {
 		sessionId, err := authService.CreateSession(user)

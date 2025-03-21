@@ -1,10 +1,11 @@
-package database
+package driver
 
 import (
 	"context"
 	"database/sql"
 	"math/rand"
 
+	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 )
 
@@ -26,6 +27,14 @@ func (d MockDatabaseDriver) FindAllUsers(ctx context.Context) ([]entities.User, 
 	return list, nil
 }
 
+func (d MockDatabaseDriver) FindUser(ctx context.Context, userID int64) (entities.User, error) {
+	res, ok := d.list[userID]
+	if !ok {
+		return entities.User{}, driverErrors.ErrRecordNotFound
+	}
+	return res.(entities.User), nil
+}
+
 func (d MockDatabaseDriver) FindUserByUsername(ctx context.Context, username string) (entities.User, error) {
 	for _, row := range d.list {
 		user := row.(entities.User)
@@ -34,7 +43,7 @@ func (d MockDatabaseDriver) FindUserByUsername(ctx context.Context, username str
 		}
 	}
 
-	return entities.User{}, ErrRecordNotFound
+	return entities.User{}, driverErrors.ErrRecordNotFound
 }
 
 func (d MockDatabaseDriver) CreateUser(ctx context.Context, params entities.CreateUserParams) (sql.Result, error) {

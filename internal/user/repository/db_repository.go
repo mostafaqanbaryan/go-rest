@@ -1,4 +1,4 @@
-package repositories
+package repository
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 type DB interface {
 	FindAllUsers(context.Context) ([]entities.User, error)
 	FindUserByUsername(context.Context, string) (entities.User, error)
+	FindUser(context.Context, int64) (entities.User, error)
 	CreateUser(context.Context, entities.CreateUserParams) (sql.Result, error)
 	UpdateUser(context.Context, entities.UpdateUserParams) error
 	DeleteUser(context.Context, int64) error
@@ -28,6 +29,14 @@ func NewUserRepository(db DB) UserRepository {
 func (r UserRepository) FindByUsername(username string) (entities.User, error) {
 	ctx := context.Background()
 	user, err := r.db.FindUserByUsername(ctx, username)
+	if err != nil {
+		return entities.User{}, err
+	}
+	return user, nil
+}
+func (r UserRepository) FindUser(userID int64) (entities.User, error) {
+	ctx := context.Background()
+	user, err := r.db.FindUser(ctx, userID)
 	if err != nil {
 		return entities.User{}, err
 	}

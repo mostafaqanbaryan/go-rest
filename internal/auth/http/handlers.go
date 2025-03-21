@@ -1,4 +1,4 @@
-package handlers
+package http
 
 import (
 	"net/http"
@@ -9,17 +9,17 @@ import (
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 )
 
-type AuthService interface {
+type authService interface {
 	CreateSession(user entities.User) (string, error)
 }
 
-type UserService interface {
+type userService interface {
 	Login(username, password string) (entities.User, error)
 }
 
 type AuthHandler struct {
-	userService UserService
-	authService AuthService
+	userService userService
+	authService authService
 }
 
 type LoginRequest struct {
@@ -27,7 +27,7 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-func NewAuthHandler(authService AuthService, userService UserService) AuthHandler {
+func NewAuthHandler(authService authService, userService userService) AuthHandler {
 	return AuthHandler{
 		userService: userService,
 		authService: authService,
@@ -55,9 +55,10 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, "")
 }
 
-func (h *AuthHandler) Logout(c echo.Context) {
+func (h *AuthHandler) Logout(c echo.Context) error {
 	cookie := createCookie("", time.Time{})
 	c.SetCookie(&cookie)
+	return nil
 }
 
 func createCookie(value string, expire time.Time) http.Cookie {

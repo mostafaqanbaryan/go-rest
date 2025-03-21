@@ -1,24 +1,28 @@
-package services
+package service_test
 
 import (
 	"errors"
 	"testing"
 
-	"mostafaqanbaryan.com/go-rest/internal/database"
+	"mostafaqanbaryan.com/go-rest/internal/driver"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
-	"mostafaqanbaryan.com/go-rest/internal/repositories"
+	userErrors "mostafaqanbaryan.com/go-rest/internal/user/errors"
+	"mostafaqanbaryan.com/go-rest/internal/user/repository"
+	"mostafaqanbaryan.com/go-rest/internal/user/service"
 )
 
 func TestUserService(t *testing.T) {
+	t.Parallel()
+
 	user := entities.User{
 		Username: "test",
 		Password: "tset",
 	}
 
-	db := database.NewMockDatabaseDriver()
+	db := driver.NewMockDatabaseDriver()
 
-	userRepository := repositories.NewUserRepository(db)
-	userService := NewUserService(userRepository)
+	userRepository := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepository)
 
 	// Initialize
 	err := userService.Register(user.Username, user.Password)
@@ -28,22 +32,22 @@ func TestUserService(t *testing.T) {
 
 	t.Run("Username is taken", func(t *testing.T) {
 		err := userService.Register(user.Username, user.Password)
-		if err != ErrUsernameTaken {
-			t.Fatalf("want <%v>, got: <%v>", ErrUsernameTaken, err)
+		if err != userErrors.ErrUsernameTaken {
+			t.Fatalf("want <%v>, got: <%v>", userErrors.ErrUsernameTaken, err)
 		}
 	})
 
 	t.Run("User not found", func(t *testing.T) {
 		_, err := userService.Login("notfound", user.Password)
-		if !errors.Is(err, ErrUserNotFound) {
-			t.Fatalf("want <%v>, got: <%v>", ErrUserNotFound, err)
+		if !errors.Is(err, userErrors.ErrUserNotFound) {
+			t.Fatalf("want <%v>, got: <%v>", userErrors.ErrUserNotFound, err)
 		}
 	})
 
 	t.Run("User password is wrong", func(t *testing.T) {
 		_, err := userService.Login(user.Username, "wrongpassword")
-		if !errors.Is(err, ErrPasswordIsWrong) {
-			t.Fatalf("want <%v>, got: <%v>", ErrPasswordIsWrong, err)
+		if !errors.Is(err, userErrors.ErrPasswordIsWrong) {
+			t.Fatalf("want <%v>, got: <%v>", userErrors.ErrPasswordIsWrong, err)
 		}
 	})
 

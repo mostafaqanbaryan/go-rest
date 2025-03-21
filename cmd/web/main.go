@@ -3,35 +3,39 @@ package main
 import (
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
+	authhandler "mostafaqanbaryan.com/go-rest/internal/auth/http"
+	authrepo "mostafaqanbaryan.com/go-rest/internal/auth/repository"
+	authservice "mostafaqanbaryan.com/go-rest/internal/auth/service"
 	"mostafaqanbaryan.com/go-rest/internal/database"
+	"mostafaqanbaryan.com/go-rest/internal/driver"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
-	"mostafaqanbaryan.com/go-rest/internal/handlers"
-	"mostafaqanbaryan.com/go-rest/internal/repositories"
-	"mostafaqanbaryan.com/go-rest/internal/services"
+	userrepo "mostafaqanbaryan.com/go-rest/internal/user/repository"
+	userservice "mostafaqanbaryan.com/go-rest/internal/user/service"
 )
 
 func main() {
 	e := echo.New()
 
-	cache := database.NewRedisDriver()
+	cache := driver.NewRedisDriver()
 	defer cache.Close()
 
-	db := database.NewMySQLDriver("")
+	db := driver.NewMySQLDriver("")
 	defer db.Close()
 
 	database.MigrateUp(db)
 	conn := entities.New(db)
 
-	authRepository := repositories.NewAuthRepository(cache)
-	authService := services.NewAuthService(authRepository)
+	authRepository := authrepo.NewAuthRepository(cache)
+	authService := authservice.NewAuthService(authRepository)
 
-	userRepository := repositories.NewUserRepository(conn)
-	userService := services.NewUserService(userRepository)
-	authHandler := handlers.NewAuthHandler(authService, userService)
+	userRepository := userrepo.NewUserRepository(conn)
+	userService := userservice.NewUserService(userRepository)
+
+	authHandler := authhandler.NewAuthHandler(authService, userService)
 
 	authGroup := e.Group("/auth")
 	authGroup.POST("/login", authHandler.Login)
-	// authGroup.GET("/logout", authHandler.Logout)
+	authGroup.GET("/logout", authHandler.Logout)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }

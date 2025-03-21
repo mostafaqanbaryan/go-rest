@@ -1,4 +1,4 @@
-package repositories
+package repository
 
 import (
 	"context"
@@ -7,31 +7,31 @@ import (
 	"strconv"
 	"time"
 
-	"mostafaqanbaryan.com/go-rest/internal/database"
+	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 )
 
-type CacheDriver interface {
+type cacheDriver interface {
 	Set(context.Context, string, any, time.Duration) error
 	Get(context.Context, string) (string, error)
 }
 
-type AuthRepositoryCache struct {
-	db CacheDriver
+type authRepository struct {
+	db cacheDriver
 }
 
-func NewAuthRepository(db CacheDriver) AuthRepositoryCache {
-	return AuthRepositoryCache{
+func NewAuthRepository(db cacheDriver) authRepository {
+	return authRepository{
 		db: db,
 	}
 }
 
-func (r AuthRepositoryCache) NewUserSession(user entities.User) (string, error) {
+func (r authRepository) NewUserSession(user entities.User) (string, error) {
 	ctx := context.Background()
 	for {
 		sessionID := generateSessionID()
 		_, err := r.db.Get(ctx, sessionID)
-		if err == database.ErrRecordNotFound {
+		if err == driverErrors.ErrRecordNotFound {
 			err := r.db.Set(ctx, sessionID, user.ID, time.Hour*10)
 			if err != nil {
 				return "", err
@@ -41,7 +41,7 @@ func (r AuthRepositoryCache) NewUserSession(user entities.User) (string, error) 
 	}
 }
 
-func (r AuthRepositoryCache) GetUserIDBySessionID(sessionID string) (int64, error) {
+func (r authRepository) GetUserIDBySessionID(sessionID string) (int64, error) {
 	ctx := context.Background()
 	res, err := r.db.Get(ctx, sessionID)
 	if err != nil {
