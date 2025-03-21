@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"strconv"
 	"time"
 
 	"mostafaqanbaryan.com/go-rest/internal/database"
@@ -40,9 +41,13 @@ func (r AuthRepositoryCache) NewUserSession(user entities.User) (string, error) 
 	}
 }
 
-func (r AuthRepositoryCache) GetUserIDBySessionID(sessionID string) (string, error) {
+func (r AuthRepositoryCache) GetUserIDBySessionID(sessionID string) (int64, error) {
 	ctx := context.Background()
-	return r.db.Get(ctx, sessionID)
+	res, err := r.db.Get(ctx, sessionID)
+	if err != nil {
+		return 0, err
+	}
+	return strconv.ParseInt(res, 10, 0)
 }
 
 func generateSessionID() string {

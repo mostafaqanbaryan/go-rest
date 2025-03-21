@@ -25,7 +25,7 @@ func main() {
 	authRepository := repositories.NewAuthRepository(cache)
 	authService := services.NewAuthService(authRepository)
 
-	userRepository := repositories.NewUserRepositoryDB(conn)
+	userRepository := repositories.NewUserRepository(conn)
 	userService := services.NewUserService(userRepository)
 	authHandler := handlers.NewAuthHandler(authService, userService)
 

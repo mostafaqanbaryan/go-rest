@@ -2,16 +2,17 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
 type MockCacheDriver struct {
-	list map[string]any
+	list map[string]string
 }
 
 func NewMockCacheDriver() MockCacheDriver {
 	return MockCacheDriver{
-		list: make(map[string]any, 0),
+		list: make(map[string]string, 0),
 	}
 }
 
@@ -21,11 +22,11 @@ func (d MockCacheDriver) Get(ctx context.Context, key string) (string, error) {
 		return "", ErrRecordNotFound
 	}
 
-	return res.(string), nil
+	return res, nil
 }
 
 func (d MockCacheDriver) Set(ctx context.Context, key string, value any, ttl time.Duration) error {
-	d.list[key] = value
+	d.list[key] = fmt.Sprintf("%v", value)
 	return nil
 }
 

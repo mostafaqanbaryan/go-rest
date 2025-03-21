@@ -4,7 +4,7 @@ import "mostafaqanbaryan.com/go-rest/internal/entities"
 
 type AuthRepository interface {
 	NewUserSession(entities.User) (string, error)
-	GetUserIDBySessionID(string) (string, error)
+	GetUserIDBySessionID(string) (int64, error)
 }
 
 type AuthService struct {
@@ -25,10 +25,10 @@ func (s AuthService) CreateSession(user entities.User) (string, error) {
 	return sessionId, nil
 }
 
-func (s AuthService) GetSession(sessionID string) (string, error) {
+func (s AuthService) GetSession(sessionID string) (int64, error) {
 	userID, err := s.repo.GetUserIDBySessionID(sessionID)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	return userID, nil
 }
