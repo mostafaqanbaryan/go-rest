@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -63,6 +64,7 @@ func createCookie(value string, expire time.Time) http.Cookie {
 	return http.Cookie{
 		Name:     "token",
 		Value:    value,
+		Domain:   os.Getenv("APP_DOMAIN"),
 		Path:     "/",
 		Expires:  expire,
 		HttpOnly: true,
