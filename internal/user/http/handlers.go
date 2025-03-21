@@ -12,7 +12,7 @@ type AuthService interface {
 }
 
 type UserService interface {
-	FindByID(int64) (entities.User, error)
+	Find(int64) (entities.User, error)
 }
 
 type UserHandler struct {
@@ -38,7 +38,7 @@ func (h *UserHandler) Me(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}
 
-	user, err := h.userService.FindByID(userID)
+	user, err := h.userService.Find(userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}

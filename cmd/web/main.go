@@ -9,6 +9,7 @@ import (
 	"mostafaqanbaryan.com/go-rest/internal/database"
 	"mostafaqanbaryan.com/go-rest/internal/driver"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
+	userhandler "mostafaqanbaryan.com/go-rest/internal/user/http"
 	userrepo "mostafaqanbaryan.com/go-rest/internal/user/repository"
 	userservice "mostafaqanbaryan.com/go-rest/internal/user/service"
 )
@@ -32,10 +33,14 @@ func main() {
 	userService := userservice.NewUserService(userRepository)
 
 	authHandler := authhandler.NewAuthHandler(authService, userService)
+	userHandler := userhandler.NewUserHandler(authService, userService)
 
 	authGroup := e.Group("/auth")
 	authGroup.POST("/login", authHandler.Login)
 	authGroup.GET("/logout", authHandler.Logout)
+
+	e.GET("/me", userHandler.Me)
+	// e.PATCH("/me", authHandler.Login)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }
