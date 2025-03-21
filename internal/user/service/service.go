@@ -1,6 +1,7 @@
 package service
 
 import (
+	"mostafaqanbaryan.com/go-rest/internal/argon2"
 	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 	userErrors "mostafaqanbaryan.com/go-rest/internal/user/errors"
@@ -23,15 +24,20 @@ func NewUserService(userRepository userRepository) userService {
 
 func (s userService) Register(username, password string) error {
 	user, err := s.repo.FindByUsername(username)
-	if user.ID > 0 {
+	if user.ID > 0 || err == nil {
 		return userErrors.ErrUsernameTaken
 	}
 
-	if err == driverErrors.ErrRecordNotFound {
-		return s.repo.Create(username, password)
+	if err != driverErrors.ErrRecordNotFound {
+		return err
 	}
 
-	return err
+	encrypted, err := argon2.CreateHash(password)
+	if err != nil {
+		return err
+	}
+	return s.repo.Create(username, encrypted)
+
 }
 
 func (s userService) Login(username, password string) (entities.User, error) {
@@ -40,7 +46,8 @@ func (s userService) Login(username, password string) (entities.User, error) {
 		return entities.User{}, userErrors.ErrUserNotFound
 	}
 
-	if user.Password != password {
+	match, err := argon2.CompareHash(password, user.Password)
+	if err != nil || !match {
 		return entities.User{}, userErrors.ErrPasswordIsWrong
 	}
 
