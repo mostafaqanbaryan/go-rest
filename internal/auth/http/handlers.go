@@ -14,7 +14,7 @@ type authService interface {
 }
 
 type userService interface {
-	Login(username, password string) (entities.User, error)
+	Login(email, password string) (entities.User, error)
 }
 
 type AuthHandler struct {
@@ -23,7 +23,7 @@ type AuthHandler struct {
 }
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -40,7 +40,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}
 
-	user, err := h.userService.Login(v.Username, v.Password)
+	user, err := h.userService.Login(v.Email, v.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}

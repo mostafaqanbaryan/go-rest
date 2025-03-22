@@ -13,7 +13,7 @@ func TestUserHandler(t *testing.T) {
 	t.Parallel()
 
 	user := entities.User{
-		Username: "test",
+		Email:    "test",
 		Password: "tset",
 	}
 	db := driver.NewMockDatabaseDriver()
@@ -21,13 +21,13 @@ func TestUserHandler(t *testing.T) {
 	userService := service.NewUserService(repo)
 
 	// Initialize
-	err := userService.Register(user.Username, user.Password)
+	err := userService.Register(user.Email, user.Password)
 	if err != nil {
 		t.Fatalf("register wants no error, got: <%v>", err)
 	}
 
 	// Create session
-	user, err = userService.Login(user.Username, user.Password)
+	user, err = userService.Login(user.Email, user.Password)
 	if err != nil {
 		t.Fatalf("login wants no error, got: <%v>", err)
 	}

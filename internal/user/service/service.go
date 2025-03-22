@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	"mostafaqanbaryan.com/go-rest/internal/argon2"
 	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
@@ -8,9 +9,9 @@ import (
 )
 
 type userRepository interface {
-	Create(string, string) error
+	Create(string, string, string) error
 	FindUser(int64) (entities.User, error)
-	FindByUsername(string) (entities.User, error)
+	FindByEmail(string) (entities.User, error)
 }
 type userService struct {
 	repo userRepository
@@ -22,10 +23,10 @@ func NewUserService(userRepository userRepository) userService {
 	}
 }
 
-func (s userService) Register(username, password string) error {
-	user, err := s.repo.FindByUsername(username)
+func (s userService) Register(email, password string) error {
+	user, err := s.repo.FindByEmail(email)
 	if user.ID > 0 || err == nil {
-		return userErrors.ErrUsernameTaken
+		return userErrors.ErrEmailTaken
 	}
 
 	if err != driverErrors.ErrRecordNotFound {
@@ -36,12 +37,17 @@ func (s userService) Register(username, password string) error {
 	if err != nil {
 		return err
 	}
-	return s.repo.Create(username, encrypted)
+
+	hashID, err := uuid.NewRandom()
+	if err != nil {
+		return err
+	}
+	return s.repo.Create(hashID.String(), email, encrypted)
 
 }
 
-func (s userService) Login(username, password string) (entities.User, error) {
-	user, err := s.repo.FindByUsername(username)
+func (s userService) Login(email, password string) (entities.User, error) {
+	user, err := s.repo.FindByEmail(email)
 	if err != nil {
 		return entities.User{}, userErrors.ErrUserNotFound
 	}

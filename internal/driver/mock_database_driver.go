@@ -35,10 +35,10 @@ func (d MockDatabaseDriver) FindUser(ctx context.Context, userID int64) (entitie
 	return res.(entities.User), nil
 }
 
-func (d MockDatabaseDriver) FindUserByUsername(ctx context.Context, username string) (entities.User, error) {
+func (d MockDatabaseDriver) FindUserByEmail(ctx context.Context, email string) (entities.User, error) {
 	for _, row := range d.list {
 		user := row.(entities.User)
-		if username == user.Username {
+		if email == user.Email {
 			return user, nil
 		}
 	}
@@ -50,13 +50,14 @@ func (d MockDatabaseDriver) CreateUser(ctx context.Context, params entities.Crea
 	userID := rand.Int63()
 	d.list[userID] = entities.User{
 		ID:       userID,
-		Username: params.Username,
+		HashID:   params.HashID,
+		Email:    params.Email,
 		Password: params.Password,
 	}
 	return nil, nil
 }
 
-func (d MockDatabaseDriver) UpdateUser(ctx context.Context, params entities.UpdateUserParams) error {
+func (d MockDatabaseDriver) UpdatePassword(ctx context.Context, params entities.UpdatePasswordParams) error {
 	d.list[params.ID] = params
 	return nil
 }

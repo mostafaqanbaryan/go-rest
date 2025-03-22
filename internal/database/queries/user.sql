@@ -1,9 +1,13 @@
 -- name: CreateUser :execresult
-INSERT INTO users (username, password) VALUES (?, ?);
+INSERT INTO users (hash_id, email, password) VALUES (?, ?, ?);
 
--- name: FindUserByUsername :one
+-- name: FindUserByEmail :one
 SELECT * FROM users
-WHERE username = ? LIMIT 1;
+WHERE email = ? LIMIT 1;
+
+-- name: FindUserByHashId :one
+SELECT * FROM users
+WHERE hash_id = ? LIMIT 1;
 
 -- name: FindUser :one
 SELECT * FROM users
@@ -12,9 +16,9 @@ WHERE id = ? LIMIT 1;
 -- name: FindAllUsers :many
 SELECT * FROM users;
 
--- name: UpdateUser :exec
+-- name: UpdatePassword :exec
 UPDATE users
-SET username = ?, password = ?
+SET password = ?
 WHERE id = ?;
 
 -- name: DeleteUser :exec

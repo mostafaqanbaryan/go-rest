@@ -4,6 +4,6 @@ import "errors"
 
 var (
 	ErrUserNotFound    = errors.New("user not found")
-	ErrUsernameTaken   = errors.New("username taken")
+	ErrEmailTaken      = errors.New("email is taken")
 	ErrPasswordIsWrong = errors.New("password is wrong")
 )

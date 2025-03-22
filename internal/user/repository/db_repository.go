@@ -9,10 +9,10 @@ import (
 
 type DB interface {
 	FindAllUsers(context.Context) ([]entities.User, error)
-	FindUserByUsername(context.Context, string) (entities.User, error)
+	FindUserByEmail(context.Context, string) (entities.User, error)
 	FindUser(context.Context, int64) (entities.User, error)
 	CreateUser(context.Context, entities.CreateUserParams) (sql.Result, error)
-	UpdateUser(context.Context, entities.UpdateUserParams) error
+	UpdatePassword(context.Context, entities.UpdatePasswordParams) error
 	DeleteUser(context.Context, int64) error
 }
 
@@ -26,9 +26,9 @@ func NewUserRepository(db DB) UserRepository {
 	}
 }
 
-func (r UserRepository) FindByUsername(username string) (entities.User, error) {
+func (r UserRepository) FindByEmail(email string) (entities.User, error) {
 	ctx := context.Background()
-	user, err := r.db.FindUserByUsername(ctx, username)
+	user, err := r.db.FindUserByEmail(ctx, email)
 	if err != nil {
 		return entities.User{}, err
 	}
@@ -43,10 +43,11 @@ func (r UserRepository) FindUser(userID int64) (entities.User, error) {
 	return user, nil
 }
 
-func (r UserRepository) Create(username, password string) error {
+func (r UserRepository) Create(hashID, email, password string) error {
 	ctx := context.Background()
 	params := entities.CreateUserParams{
-		Username: username,
+		HashID:   hashID,
+		Email:    email,
 		Password: password,
 	}
 	_, err := r.db.CreateUser(ctx, params)

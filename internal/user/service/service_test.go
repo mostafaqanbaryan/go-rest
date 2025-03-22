@@ -15,7 +15,7 @@ func TestUserService(t *testing.T) {
 	t.Parallel()
 
 	user := entities.User{
-		Username: "test",
+		Email:    "test",
 		Password: "tset",
 	}
 
@@ -25,15 +25,15 @@ func TestUserService(t *testing.T) {
 	userService := service.NewUserService(userRepository)
 
 	// Initialize
-	err := userService.Register(user.Username, user.Password)
+	err := userService.Register(user.Email, user.Password)
 	if err != nil {
 		t.Fatalf("register wants no error, got: <%v>", err)
 	}
 
-	t.Run("Username is taken", func(t *testing.T) {
-		err := userService.Register(user.Username, user.Password)
-		if err != userErrors.ErrUsernameTaken {
-			t.Fatalf("want <%v>, got: <%v>", userErrors.ErrUsernameTaken, err)
+	t.Run("Email is taken", func(t *testing.T) {
+		err := userService.Register(user.Email, user.Password)
+		if err != userErrors.ErrEmailTaken {
+			t.Fatalf("want <%v>, got: <%v>", userErrors.ErrEmailTaken, err)
 		}
 	})
 
@@ -45,20 +45,20 @@ func TestUserService(t *testing.T) {
 	})
 
 	t.Run("User password is wrong", func(t *testing.T) {
-		_, err := userService.Login(user.Username, "wrongpassword")
+		_, err := userService.Login(user.Email, "wrongpassword")
 		if !errors.Is(err, userErrors.ErrPasswordIsWrong) {
 			t.Fatalf("want <%v>, got: <%v>", userErrors.ErrPasswordIsWrong, err)
 		}
 	})
 
 	t.Run("User found", func(t *testing.T) {
-		found, err := userService.Login(user.Username, user.Password)
+		found, err := userService.Login(user.Email, user.Password)
 		if err != nil {
 			t.Fatalf("want nil, got: <%v>", err)
 		}
 
-		if found.Username != user.Username {
-			t.Fatalf("want username %s, got: <%v>", found.Username, user.Username)
+		if found.Email != user.Email {
+			t.Fatalf("want email %s, got: <%v>", found.Email, user.Email)
 		}
 
 		if found.ID == 0 {

@@ -14,7 +14,7 @@ func TestAuthService(t *testing.T) {
 
 	user := entities.User{
 		ID:       123,
-		Username: "test",
+		Email:    "test",
 		Password: "test",
 	}
 
@@ -34,7 +34,7 @@ func TestAuthService(t *testing.T) {
 		}
 
 		if userID != user.ID {
-			t.Fatalf("want username %d, got: %v", user.ID, userID)
+			t.Fatalf("want email %d, got: %v", user.ID, userID)
 		}
 	})
 }
