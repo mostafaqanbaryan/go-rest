@@ -10,10 +10,10 @@ import (
 )
 
 func init() {
-	goose.AddMigrationContext(Up20250312194440, Down20250312194440)
+	goose.AddMigrationContext(upAddAdmin, downAddAdmin)
 }
 
-func Up20250312194440(ctx context.Context, tx *sql.Tx) error {
+func upAddAdmin(ctx context.Context, tx *sql.Tx) error {
 	encrypted, err := argon2.CreateHash("123")
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func Up20250312194440(ctx context.Context, tx *sql.Tx) error {
 	return nil
 }
 
-func Down20250312194440(ctx context.Context, tx *sql.Tx) error {
+func downAddAdmin(ctx context.Context, tx *sql.Tx) error {
 	_, err := tx.ExecContext(ctx, `DELETE FROM users WHERE email = 'admin@go-rest';`)
 	return err
 }
