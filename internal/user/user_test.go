@@ -3,7 +3,6 @@ package user_test
 import (
 	"testing"
 
-	"mostafaqanbaryan.com/go-rest/internal/driver"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 	"mostafaqanbaryan.com/go-rest/internal/user/repository"
 	"mostafaqanbaryan.com/go-rest/internal/user/service"
@@ -16,8 +15,7 @@ func TestUserHandler(t *testing.T) {
 		Email:    "test",
 		Password: "tset",
 	}
-	db := driver.NewMockDatabaseDriver()
-	repo := repository.NewUserRepository(db)
+	repo := repository.NewMockUserRepository()
 	userService := service.NewUserService(repo)
 
 	// Initialize

@@ -3,12 +3,42 @@ package service_test
 import (
 	"testing"
 
-	"mostafaqanbaryan.com/go-rest/internal/auth/repository"
 	"mostafaqanbaryan.com/go-rest/internal/auth/service"
-	"mostafaqanbaryan.com/go-rest/internal/driver"
+	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
+	"mostafaqanbaryan.com/go-rest/pkg/strings"
 )
 
+type mockAuthRepository struct {
+	list map[string]int64
+}
+
+func newMockAuthRepository() mockAuthRepository {
+	return mockAuthRepository{
+		list: make(map[string]int64, 0),
+	}
+}
+
+func (r mockAuthRepository) NewUserSession(user entities.User) (string, error) {
+	for {
+		sessionID := strings.GenerateRandom(32)
+		_, ok := r.list[sessionID]
+		if ok {
+			continue
+		}
+
+		r.list[sessionID] = user.ID
+		return sessionID, nil
+	}
+}
+
+func (r mockAuthRepository) GetUserIDBySessionID(sessionID string) (int64, error) {
+	res, ok := r.list[sessionID]
+	if !ok {
+		return 0, driverErrors.ErrRecordNotFound
+	}
+	return res, nil
+}
 func TestAuthService(t *testing.T) {
 	t.Parallel()
 
@@ -18,8 +48,7 @@ func TestAuthService(t *testing.T) {
 		Password: "test",
 	}
 
-	cache := driver.NewMockCacheDriver()
-	authRepository := repository.NewAuthRepository(cache)
+	authRepository := newMockAuthRepository()
 	authService := service.NewAuthService(authRepository)
 
 	t.Run("Create session", func(t *testing.T) {

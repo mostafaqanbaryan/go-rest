@@ -12,6 +12,7 @@ type userRepository interface {
 	Create(string, string, string) error
 	FindUser(int64) (entities.User, error)
 	FindByEmail(string) (entities.User, error)
+	Update(int64, string) error
 }
 type userService struct {
 	repo userRepository
@@ -24,8 +25,8 @@ func NewUserService(userRepository userRepository) userService {
 }
 
 func (s userService) Register(email, password string) error {
-	user, err := s.repo.FindByEmail(email)
-	if user.ID > 0 || err == nil {
+	duplicate, err := s.repo.FindByEmail(email)
+	if duplicate.ID > 0 || err == nil {
 		return userErrors.ErrEmailTaken
 	}
 

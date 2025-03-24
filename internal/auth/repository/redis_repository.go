@@ -2,13 +2,12 @@ package repository
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"strconv"
 	"time"
 
 	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
+	"mostafaqanbaryan.com/go-rest/pkg/strings"
 )
 
 type cacheDriver interface {
@@ -29,7 +28,7 @@ func NewAuthRepository(db cacheDriver) authRepository {
 func (r authRepository) NewUserSession(user entities.User) (string, error) {
 	ctx := context.Background()
 	for {
-		sessionID := generateSessionID()
+		sessionID := strings.GenerateRandom(32)
 		_, err := r.db.Get(ctx, sessionID)
 		if err == driverErrors.ErrRecordNotFound {
 			err := r.db.Set(ctx, sessionID, user.ID, time.Hour*10)
@@ -48,13 +47,4 @@ func (r authRepository) GetUserIDBySessionID(sessionID string) (int64, error) {
 		return 0, err
 	}
 	return strconv.ParseInt(res, 10, 0)
-}
-
-func generateSessionID() string {
-	b := make([]byte, 32)
-	_, err := rand.Read(b)
-	if err != nil {
-		panic(err)
-	}
-	return hex.EncodeToString(b)
 }

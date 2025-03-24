@@ -7,49 +7,62 @@ import (
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 )
 
-type DB interface {
+type sqlcConnection interface {
 	FindAllUsers(context.Context) ([]entities.User, error)
 	FindUserByEmail(context.Context, string) (entities.User, error)
 	FindUser(context.Context, int64) (entities.User, error)
 	CreateUser(context.Context, entities.CreateUserParams) (sql.Result, error)
-	UpdatePassword(context.Context, entities.UpdatePasswordParams) error
+	UpdateUser(context.Context, entities.UpdateUserParams) error
 	DeleteUser(context.Context, int64) error
 }
 
-type UserRepository struct {
-	db DB
+type userRepository struct {
+	conn sqlcConnection
+	db   *sql.DB
 }
 
-func NewUserRepository(db DB) UserRepository {
-	return UserRepository{
-		db,
+func NewUserRepository(db *sql.DB) userRepository {
+	conn := entities.New(db)
+	return userRepository{
+		conn: conn,
+		db:   db,
 	}
 }
 
-func (r UserRepository) FindByEmail(email string) (entities.User, error) {
+func (r userRepository) FindByEmail(email string) (entities.User, error) {
 	ctx := context.Background()
-	user, err := r.db.FindUserByEmail(ctx, email)
+	user, err := r.conn.FindUserByEmail(ctx, email)
 	if err != nil {
 		return entities.User{}, err
 	}
 	return user, nil
 }
-func (r UserRepository) FindUser(userID int64) (entities.User, error) {
+func (r userRepository) FindUser(userID int64) (entities.User, error) {
 	ctx := context.Background()
-	user, err := r.db.FindUser(ctx, userID)
+	user, err := r.conn.FindUser(ctx, userID)
 	if err != nil {
 		return entities.User{}, err
 	}
 	return user, nil
 }
 
-func (r UserRepository) Create(hashID, email, password string) error {
+func (r userRepository) Create(hashID, email, password string) error {
 	ctx := context.Background()
 	params := entities.CreateUserParams{
 		HashID:   hashID,
 		Email:    email,
 		Password: password,
 	}
-	_, err := r.db.CreateUser(ctx, params)
+	_, err := r.conn.CreateUser(ctx, params)
+	return err
+}
+
+func (r userRepository) Update(userID int64, fullname string) error {
+	ctx := context.Background()
+	params := entities.UpdateUserParams{
+		ID:       userID,
+		Fullname: sql.NullString{String: fullname},
+	}
+	err := r.conn.UpdateUser(ctx, params)
 	return err
 }

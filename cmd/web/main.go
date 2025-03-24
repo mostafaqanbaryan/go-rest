@@ -7,7 +7,6 @@ import (
 	authrepo "mostafaqanbaryan.com/go-rest/internal/auth/repository"
 	authservice "mostafaqanbaryan.com/go-rest/internal/auth/service"
 	"mostafaqanbaryan.com/go-rest/internal/driver"
-	"mostafaqanbaryan.com/go-rest/internal/entities"
 	userhandler "mostafaqanbaryan.com/go-rest/internal/user/http"
 	userrepo "mostafaqanbaryan.com/go-rest/internal/user/repository"
 	userservice "mostafaqanbaryan.com/go-rest/internal/user/service"
@@ -23,14 +22,12 @@ func main() {
 	db := driver.NewMySQLDriver("")
 	defer db.Close()
 
-	conn := entities.New(db)
-
 	validator := validation.NewValidator()
 
 	authRepository := authrepo.NewAuthRepository(cache)
 	authService := authservice.NewAuthService(authRepository)
 
-	userRepository := userrepo.NewUserRepository(conn)
+	userRepository := userrepo.NewUserRepository(db)
 	userService := userservice.NewUserService(userRepository)
 
 	authHandler := authhandler.NewAuthHandler(validator, authService, userService)
