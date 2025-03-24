@@ -11,7 +11,13 @@ sql:
         json_tags_case_style: "camel"
         emit_json_tags: true
         overrides:
+          - db_type: uuid
+            go_type: "github.com/google/uuid.UUID"
+          - column: "users.hash_id"
+            go_struct_tag: "json:\"hash_id\" validate:\"uuid\""
+          - column: "users.fullname"
+            go_struct_tag: "json:\"fullname\" validate:\"fullname,min=3,max=256\""
           - column: "users.password"
             go_struct_tag: "json:\"-\""
           - column: "users.id"
-            go_struct_tag: "json:\"-\""
+            go_struct_tag: "json:\"-\" validate:\"number\""

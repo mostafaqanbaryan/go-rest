@@ -11,6 +11,7 @@ import (
 	userhandler "mostafaqanbaryan.com/go-rest/internal/user/http"
 	userrepo "mostafaqanbaryan.com/go-rest/internal/user/repository"
 	userservice "mostafaqanbaryan.com/go-rest/internal/user/service"
+	"mostafaqanbaryan.com/go-rest/pkg/validation"
 )
 
 func main() {
@@ -24,13 +25,15 @@ func main() {
 
 	conn := entities.New(db)
 
+	validator := validation.NewValidator()
+
 	authRepository := authrepo.NewAuthRepository(cache)
 	authService := authservice.NewAuthService(authRepository)
 
 	userRepository := userrepo.NewUserRepository(conn)
 	userService := userservice.NewUserService(userRepository)
 
-	authHandler := authhandler.NewAuthHandler(authService, userService)
+	authHandler := authhandler.NewAuthHandler(validator, authService, userService)
 	userHandler := userhandler.NewUserHandler(authService, userService)
 
 	authGroup := e.Group("/auth")

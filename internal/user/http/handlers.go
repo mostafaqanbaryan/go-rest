@@ -43,7 +43,5 @@ func (h *UserHandler) Me(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, err)
 	}
 
-	// dont show password //
-
 	return c.JSON(http.StatusOK, user)
 }
