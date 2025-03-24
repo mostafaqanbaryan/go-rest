@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"mostafaqanbaryan.com/go-rest/internal/argon2"
 	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
@@ -15,12 +16,14 @@ type userRepository interface {
 	Update(int64, string) error
 }
 type userService struct {
-	repo userRepository
+	validator *validator.Validate
+	repo      userRepository
 }
 
-func NewUserService(userRepository userRepository) userService {
+func NewUserService(validator *validator.Validate, userRepository userRepository) userService {
 	return userService{
-		repo: userRepository,
+		validator: validator,
+		repo:      userRepository,
 	}
 }
 

@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 )
@@ -21,7 +20,6 @@ type userService interface {
 type AuthHandler struct {
 	userService userService
 	authService authService
-	validator   *validator.Validate
 }
 
 type LoginRequest struct {
@@ -29,11 +27,10 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=6,max=128"`
 }
 
-func NewAuthHandler(validator *validator.Validate, authService authService, userService userService) AuthHandler {
+func NewAuthHandler(authService authService, userService userService) AuthHandler {
 	return AuthHandler{
 		userService: userService,
 		authService: authService,
-		validator:   validator,
 	}
 }
 
@@ -41,10 +38,6 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	v := LoginRequest{}
 	if err := c.Bind(&v); err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, err)
-	}
-
-	if err := h.validator.Struct(v); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	user, err := h.userService.Login(v.Email, v.Password)

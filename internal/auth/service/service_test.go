@@ -13,12 +13,6 @@ type mockAuthRepository struct {
 	list map[string]int64
 }
 
-func newMockAuthRepository() mockAuthRepository {
-	return mockAuthRepository{
-		list: make(map[string]int64, 0),
-	}
-}
-
 func (r mockAuthRepository) NewUserSession(user entities.User) (string, error) {
 	for {
 		sessionID := strings.GenerateRandom(32)
@@ -48,7 +42,10 @@ func TestAuthService(t *testing.T) {
 		Password: "test",
 	}
 
-	authRepository := newMockAuthRepository()
+	authRepository := &mockAuthRepository{
+		list: map[string]int64{},
+	}
+
 	authService := service.NewAuthService(authRepository)
 
 	t.Run("Create session", func(t *testing.T) {

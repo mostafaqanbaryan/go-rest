@@ -6,21 +6,17 @@ import (
 	"testing"
 
 	"math/rand"
+
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 	userErrors "mostafaqanbaryan.com/go-rest/internal/user/errors"
 	"mostafaqanbaryan.com/go-rest/internal/user/service"
+	"mostafaqanbaryan.com/go-rest/pkg/validation"
 
 	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 )
 
 type MockUserRepository struct {
 	list map[int64]*entities.User
-}
-
-func newMockUserRepository() MockUserRepository {
-	return MockUserRepository{
-		list: make(map[int64]*entities.User, 0),
-	}
 }
 
 func (r MockUserRepository) FindByEmail(email string) (entities.User, error) {
@@ -60,23 +56,40 @@ func TestUserService(t *testing.T) {
 	t.Parallel()
 
 	user := entities.User{
-		Email:    "test",
+		ID:       1,
+		HashID:   "ee179e27-6dbc-4301-a3ff-37cc26fdc731",
+		Email:    "test@rest.go",
 		Password: "tset",
 	}
 
-	userRepository := newMockUserRepository()
-	userService := service.NewUserService(userRepository)
-
-	// Initialize
-	err := userService.Register(user.Email, user.Password)
-	if err != nil {
-		t.Fatalf("register wants no error, got: <%v>", err)
+	userRepository := &MockUserRepository{
+		list: map[int64]*entities.User{
+			1: &user,
+		},
 	}
+
+	validator := validation.NewValidator()
+
+	userService := service.NewUserService(validator, userRepository)
 
 	t.Run("Email is taken", func(t *testing.T) {
 		err := userService.Register(user.Email, user.Password)
 		if err != userErrors.ErrEmailTaken {
 			t.Fatalf("want <%v>, got: <%v>", userErrors.ErrEmailTaken, err)
+		}
+	})
+
+	t.Run("Password is weak", func(t *testing.T) {
+		err := userService.Register(user.Email, user.Password)
+		if err != userErrors.ErrPasswordIsWrong {
+			t.Fatalf("want <%v>, got: <%v>", userErrors.ErrEmailTaken, err)
+		}
+	})
+
+	t.Run("Successful registration", func(t *testing.T) {
+		err := userService.Register(user.Email, user.Password)
+		if err != nil {
+			t.Fatalf("register wants no error, got: <%v>", err)
 		}
 	})
 
@@ -107,5 +120,65 @@ func TestUserService(t *testing.T) {
 		if found.ID == 0 {
 			t.Fatalf("want an id, got: <%v>", user.ID)
 		}
+
+		t.Run("Update fullname with invalid characters", func(t *testing.T) {
+			params := entities.User{
+				Fullname: "123test",
+			}
+			err = userService.Update(found.ID, params)
+			if err == nil {
+				t.Fatalf("want error, got no error")
+			}
+		})
+
+		t.Run("Update fullname with short name", func(t *testing.T) {
+			fullname := strings.Repeat("a", 2)
+			params := entities.User{
+				Fullname: fullname,
+			}
+			err = userService.Update(found.ID, params)
+			if err == nil {
+				t.Fatalf("want error, got no error")
+			}
+
+			updated, _ := userService.Find(found.ID)
+			if updated.Fullname != found.Fullname {
+				t.Fatalf("want fullname %s, got: <%v>", found.Fullname, updated.Fullname)
+			}
+		})
+
+		t.Run("Update fullname with long name", func(t *testing.T) {
+			fullname := strings.Repeat("a", 256)
+			params := entities.User{
+				Fullname: fullname,
+			}
+			err = userService.Update(found.ID, params)
+			if err == nil {
+				t.Fatalf("want error, got no error")
+			}
+
+			updated, _ := userService.Find(found.ID)
+			if updated.Fullname != found.Fullname {
+				t.Fatalf("want fullname %s, got: <%v>", found.Fullname, updated.Fullname)
+			}
+		})
+
+		t.Run("Update fullname with valid characters", func(t *testing.T) {
+			fullname := "test test-ts jr."
+			params := entities.User{
+				Fullname: fullname,
+			}
+			err = userService.Update(found.ID, params)
+			if err != nil {
+				t.Fatalf("want no error, got: <%v>", err)
+			}
+
+			updated, _ := userService.Find(found.ID)
+			if updated.Fullname != fullname {
+				t.Fatalf("want fullname %s, got: <%v>", fullname, updated.Fullname)
+			}
+		})
+
 	})
+
 }

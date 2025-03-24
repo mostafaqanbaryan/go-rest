@@ -28,9 +28,9 @@ func main() {
 	authService := authservice.NewAuthService(authRepository)
 
 	userRepository := userrepo.NewUserRepository(db)
-	userService := userservice.NewUserService(userRepository)
+	userService := userservice.NewUserService(validator, userRepository)
 
-	authHandler := authhandler.NewAuthHandler(validator, authService, userService)
+	authHandler := authhandler.NewAuthHandler(authService, userService)
 	userHandler := userhandler.NewUserHandler(authService, userService)
 
 	authGroup := e.Group("/auth")
