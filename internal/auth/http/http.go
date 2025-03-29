@@ -1,4 +1,4 @@
-package http
+package authhttp
 
 import (
 	"net/http"
@@ -15,6 +15,7 @@ type authService interface {
 
 type userService interface {
 	Login(email, password string) (entities.User, error)
+	Register(email, password string) error
 }
 
 type AuthHandler struct {
@@ -32,6 +33,20 @@ func NewAuthHandler(authService authService, userService userService) AuthHandle
 		userService: userService,
 		authService: authService,
 	}
+}
+
+func (h *AuthHandler) Register(c echo.Context) error {
+	v := LoginRequest{}
+	if err := c.Bind(&v); err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
+	}
+
+	err := h.userService.Register(v.Email, v.Password)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
+	}
+
+	return nil
 }
 
 func (h *AuthHandler) Login(c echo.Context) error {

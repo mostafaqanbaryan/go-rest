@@ -1,4 +1,4 @@
-package service
+package authservice
 
 import "mostafaqanbaryan.com/go-rest/internal/entities"
 

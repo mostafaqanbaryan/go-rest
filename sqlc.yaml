@@ -16,7 +16,7 @@ sql:
           - column: "users.hash_id"
             go_struct_tag: "json:\"hash_id\" validate:\"omitempty,uuid\""
           - column: "users.fullname"
-            go_struct_tag: "json:\"fullname\" validate:\"omitempty,fullname,min=3,max=256\""
+            go_struct_tag: "json:\"fullname\" validate:\"omitempty,fullname,min=3,max=255\""
           - column: "users.password"
             go_struct_tag: "json:\"-\""
           - column: "users.id"
