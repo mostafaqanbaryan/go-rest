@@ -29,7 +29,7 @@ func NewUserHandler(authService AuthService, userService UserService) UserHandle
 }
 
 type UpdateRequest struct {
-	Fullname string `validate:"required,fullname"`
+	Fullname string
 }
 
 func (h *UserHandler) Me(c echo.Context) error {
