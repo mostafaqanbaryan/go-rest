@@ -5,6 +5,7 @@ import (
 )
 
 type AuthHandler interface {
+	Register(echo.Context) error
 	Logout(echo.Context) error
 	Login(echo.Context) error
 }
@@ -18,6 +19,7 @@ func NewServer(authHandler AuthHandler, userHandler UserHandler) {
 	e := echo.New()
 
 	authGroup := e.Group("/auth")
+	authGroup.POST("/register", authHandler.Register)
 	authGroup.POST("/login", authHandler.Login)
 	authGroup.GET("/logout", authHandler.Logout)
 
