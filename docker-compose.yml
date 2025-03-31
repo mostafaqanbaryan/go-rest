@@ -9,7 +9,7 @@ services:
       - 3000:3000
     volumes:
       - ./:/app
-      - ./.env.docker:/app/.env
+      - ./.env:/app/.env
     depends_on:
       db:
         condition: service_healthy
