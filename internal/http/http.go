@@ -11,6 +11,7 @@ type AuthHandler interface {
 
 type UserHandler interface {
 	Me(echo.Context) error
+	Update(echo.Context) error
 }
 
 func NewServer(authHandler AuthHandler, userHandler UserHandler) {
@@ -21,7 +22,7 @@ func NewServer(authHandler AuthHandler, userHandler UserHandler) {
 	authGroup.GET("/logout", authHandler.Logout)
 
 	e.GET("/me", userHandler.Me)
-	// e.PATCH("/me", authHandler.Login)
+	e.POST("/me", userHandler.Update)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }
