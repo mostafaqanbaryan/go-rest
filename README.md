@@ -68,6 +68,9 @@ docker compose watch
 ```
 
 ### Using the CLI
+
+This should be inside the container, but if you set the `.env` to work outside the container, you can run it locally as well.
+
 ```bash
 # Run migrations (using goose)
 go run cmd/cli/main.go migrate up
