@@ -68,6 +68,9 @@ docker compose watch
 ```
 
 ### Using the CLI
+
+This should be inside the container, but if you set the `.env` to work outside the container, you can run it locally as well.
+
 ```bash
 # Run migrations (using goose)
 go run cmd/cli/main.go migrate up
@@ -104,6 +107,7 @@ Here's what's coming next to make GoREST even better:
 - [ ] Implement better logging (Zap or Logrus?)
 - [ ] Integrate Ofelia for scheduled tasks
 - [ ] Add gRPC layer for microservices
+- [ ] Removing `error` packages and handle them in services
 - [ ] Add more RESTful endpoints
 
 ## 📄 License

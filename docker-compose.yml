@@ -10,6 +10,10 @@ services:
     volumes:
       - ./:/app
       - ./.env:/app/.env
+    develop:
+      watch:
+        - action: rebuild
+          path: ./go.mod
     depends_on:
       db:
         condition: service_healthy
@@ -32,6 +36,7 @@ services:
     healthcheck:
       test: mysqladmin ping -u $$MYSQL_USER -p$$MYSQL_PASSWORD
       retries: 10
+      interval: 1s
 
   cache:
     container_name: gorest_cache
@@ -45,6 +50,7 @@ services:
     healthcheck:
       test: "[ $$(redis-cli ping) = 'PONG' ]"
       retries: 10
+      interval: 1s
 
 networks:
   gorest:
