@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 	"mostafaqanbaryan.com/go-rest/pkg/strings"
 )
@@ -13,6 +12,7 @@ import (
 type cacheDriver interface {
 	Set(context.Context, string, any, time.Duration) error
 	Get(context.Context, string) (string, error)
+	Has(context.Context, string) (bool, error)
 }
 
 type authRepository struct {
@@ -29,8 +29,12 @@ func (r authRepository) NewUserSession(user entities.User) (string, error) {
 	ctx := context.Background()
 	for {
 		sessionID := strings.GenerateRandom(32)
-		_, err := r.db.Get(ctx, sessionID)
-		if err == driverErrors.ErrRecordNotFound {
+		exists, err := r.db.Has(ctx, sessionID)
+		if err != nil {
+			return "", err
+		}
+
+		if !exists {
 			err := r.db.Set(ctx, sessionID, user.ID, time.Hour*10)
 			if err != nil {
 				return "", err

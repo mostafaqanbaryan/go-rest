@@ -2,13 +2,19 @@ package driver
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
+)
+
+var (
+	ErrRecordNotFound = errors.New("record not found")
+	ErrGetCommand     = errors.New("GET command error")
+	ErrSetCommand     = errors.New("SET command error")
 )
 
 type RedisDriver struct {
@@ -52,12 +58,12 @@ func NewRedisDriver() RedisDriver {
 func (d RedisDriver) Get(ctx context.Context, key string) (string, error) {
 	get := d.redis.Get(ctx, key)
 	if get == nil {
-		return "", driverErrors.ErrGetCommand
+		return "", ErrGetCommand
 	}
 
 	result, err := get.Result()
 	if err == redis.Nil {
-		return "", driverErrors.ErrRecordNotFound
+		return "", ErrRecordNotFound
 	} else if err != nil {
 		return "", err
 	}
@@ -65,10 +71,23 @@ func (d RedisDriver) Get(ctx context.Context, key string) (string, error) {
 	return result, nil
 }
 
+func (d RedisDriver) Has(ctx context.Context, key string) (bool, error) {
+	_, err := d.Get(ctx, key)
+	if err == ErrRecordNotFound {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (d RedisDriver) Set(ctx context.Context, key string, value any, ttl time.Duration) error {
 	set := d.redis.Set(ctx, key, value, ttl)
 	if set == nil {
-		return driverErrors.ErrSetCommand
+		return ErrSetCommand
 	}
 
 	if err := set.Err(); err != nil {

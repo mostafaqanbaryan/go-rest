@@ -1,9 +1,9 @@
 package mock
 
 import (
+	"errors"
 	"math/rand"
 
-	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 )
 
@@ -18,12 +18,23 @@ func (r MockUserRepository) FindByEmail(email string) (entities.User, error) {
 		}
 	}
 
-	return entities.User{}, driverErrors.ErrRecordNotFound
+	return entities.User{}, errors.New("user not found")
 }
+
+func (r MockUserRepository) IsDuplicateEmail(email string) (bool, error) {
+	for _, user := range r.List {
+		if email == user.Email {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func (r MockUserRepository) FindUser(userID int64) (entities.User, error) {
 	res, ok := r.List[userID]
 	if !ok {
-		return entities.User{}, driverErrors.ErrRecordNotFound
+		return entities.User{}, errors.New("userid not found")
 	}
 	return *res, nil
 }
