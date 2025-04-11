@@ -37,6 +37,21 @@ func (r userRepository) FindByEmail(email string) (entities.User, error) {
 	}
 	return user, nil
 }
+
+func (r userRepository) IsDuplicateEmail(email string) (bool, error) {
+	ctx := context.Background()
+	user, err := r.conn.FindUserByEmail(ctx, email)
+	if err != nil {
+		return false, err
+	}
+
+	if user.ID > 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func (r userRepository) FindUser(userID int64) (entities.User, error) {
 	ctx := context.Background()
 	user, err := r.conn.FindUser(ctx, userID)

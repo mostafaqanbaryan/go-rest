@@ -1,7 +1,8 @@
 package mock
 
 import (
-	driverErrors "mostafaqanbaryan.com/go-rest/internal/driver/errors"
+	"errors"
+
 	"mostafaqanbaryan.com/go-rest/internal/entities"
 	"mostafaqanbaryan.com/go-rest/pkg/strings"
 )
@@ -26,7 +27,7 @@ func (r MockAuthRepository) NewUserSession(user entities.User) (string, error) {
 func (r MockAuthRepository) GetUserIDBySessionID(sessionID string) (int64, error) {
 	res, ok := r.List[sessionID]
 	if !ok {
-		return 0, driverErrors.ErrRecordNotFound
+		return 0, errors.New("record not found")
 	}
 	return res, nil
 }
